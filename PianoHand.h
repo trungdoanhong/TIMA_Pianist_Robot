@@ -19,7 +19,7 @@
 
 #define UP_FINGER_TIME	100
 
-#define STEPS_PER_MM		80
+#define STEPS_PER_MM		160
 #define WIDTH_OF_KEY		23.5f
 #define PLACEMENT_OFFSET	0
 
@@ -32,6 +32,7 @@ public:
 	void SetActiveAngle(int releaseAngle, int pressAngle);
 	int* GetFingerState();
 	uint8_t GetCurrentPos();
+	void PressKey(uint8_t key, uint8_t value);
 	void PressKeys(uint8_t* keys, uint8_t value);
 	void Release();
 	void Move(uint8_t note);
@@ -41,10 +42,10 @@ public:
 	bool IsMoving();
 	bool IsPressing();
 
-	int32_t CurrentStep = 0;
-	int32_t DesiredStep = 0;
+	long CurrentStep = 0;
+	long DesiredStep = 0;
 	int8_t DirectionValue = 1;
-	int32_t JumpSteps = 0;
+	long JumpSteps = 0;
 
 	bool IsInvertDirection = false;
 

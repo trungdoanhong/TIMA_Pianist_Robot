@@ -60,6 +60,13 @@ uint8_t PianoHand::GetCurrentPos()
 	return fingers[0];
 }
 
+void PianoHand::PressKey(uint8_t key, uint8_t value)
+{
+	uint8_t keys[2];
+	keys[0] = key;
+	PressKeys(keys, value);
+}
+
 void PianoHand::PressKeys(uint8_t * keys, uint8_t value)
 {
 	updateFingerPosition();
@@ -100,7 +107,7 @@ void PianoHand::Move(uint8_t note)
 {
 	float posMM = note * WIDTH_OF_KEY + PLACEMENT_OFFSET;
 
-	uint32_t posSteps = posMM * STEPS_PER_MM;
+	long posSteps = posMM * STEPS_PER_MM;
 
 	DesiredStep = posSteps;
 	JumpSteps = DesiredStep - CurrentStep;
@@ -122,7 +129,7 @@ void PianoHand::UpdateHandPlacement(uint8_t note)
 {
 	float posMM = note * WIDTH_OF_KEY + PLACEMENT_OFFSET;
 
-	uint16_t posSteps = posMM * STEPS_PER_MM;
+	long posSteps = posMM * STEPS_PER_MM;
 
 	DesiredStep = CurrentStep = posSteps;
 }

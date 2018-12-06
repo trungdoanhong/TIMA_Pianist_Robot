@@ -67,30 +67,58 @@ void setup()
 	VirtualTimer.Run();
 
 	Home();
+	LaunchFingers();
 }
 
 void loop()
 {
+	
 	//PianoSheet.Execute();
+}
+
+void LaunchFingers()
+{
+	/*RightHand->UpdateHandPlacement(C5);
+	RightHand->PressKey(C5, 1);
+	delay(500);
+	RightHand->Release();
+	delay(200);
+	RightHand->PressKey(D5, 1);
+	delay(500);
+	RightHand->Release();
+	delay(200);
+	RightHand->PressKey(E5, 1);
+	delay(500);
+	RightHand->Release();
+	delay(200);
+	RightHand->PressKey(F5, 1);
+	delay(500);
+	RightHand->Release();
+	delay(200);
+	RightHand->PressKey(G5, 1);
+	delay(500);*/
 }
 
 void Home()
 {
-	//LeftHand->UpdateHandPlacement(C8);
+	Serial.println("move home");
 
-	//LeftHand->Move(A0);
+	LeftHand->UpdateHandPlacement(C8);
 
-	//while (!LeftHand->IsEndstopActive())
-	//{
-	//}
+	LeftHand->Move(A0);
 
-	//LeftHand->Stop();
+	while (!LeftHand->IsEndstopActive())
+	{
 
-	//LeftHand->UpdateHandPlacement(A0);
+	}
+
+	LeftHand->Stop();
+
+	Serial.println("finish move");
+
+	LeftHand->UpdateHandPlacement(A0);
 
 	//----------------------------------------
-
-	Serial.println("move home");
 
 	RightHand->UpdateHandPlacement(A0);
 	RightHand->Move(F7);
@@ -104,7 +132,6 @@ void Home()
 
 	RightHand->UpdateHandPlacement(F7);
 
-	Serial.println("finish move");
 }
 
 void ToggleStepPinX()
