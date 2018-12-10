@@ -6,14 +6,14 @@
 
 PianoHand::PianoHand()
 {
-	//Wire.begin();                
-	//Wire.setClock(400000);      
+	Wire.begin();                
+	Wire.setClock(400000);      
 
-	//PWMMaker = PCA9685_ServoEvaluator(102, 310, 505);
+	PWMMaker = PCA9685_ServoEvaluator(102, 310, 505);
 
-	//ServoManager.resetDevices();        // Software resets all PCA9685 devices on Wire line
-	//ServoManager.init(B000000);         // Address pins A5-A0 set to B000000
-	//ServoManager.setPWMFrequency(50);   // Set frequency to 50Hz
+	ServoManager.resetDevices();        // Software resets all PCA9685 devices on Wire line
+	ServoManager.init(B000000);         // Address pins A5-A0 set to B000000
+	ServoManager.setPWMFrequency(50);   // Set frequency to 50Hz	
 }
 
 void PianoHand::Init(uint8_t* pins, uint8_t f1, uint8_t f2, uint8_t f3, uint8_t f4, uint8_t f5)
@@ -62,7 +62,7 @@ uint8_t PianoHand::GetCurrentPos()
 
 void PianoHand::PressKey(uint8_t key, uint8_t value)
 {
-	uint8_t keys[2];
+	uint8_t keys[2] = { 0, 0 };
 	keys[0] = key;
 	PressKeys(keys, value);
 }
@@ -78,7 +78,9 @@ void PianoHand::PressKeys(uint8_t * keys, uint8_t value)
 		return;
 	}
 
-	for (uint8_t index = 0; index < 2; index++)
+	//Serial.println(fingers[0]);
+
+	for (uint8_t index = 0; index < 1; index++)
 	{
 		for (uint8_t i = 0; i < 5; i++)
 		{

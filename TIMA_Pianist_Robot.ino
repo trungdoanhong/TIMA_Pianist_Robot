@@ -1,10 +1,10 @@
 #include <Wire.h>
+#include "PCA9685.h"
 #include "Sheet.h"
 #include "PianoConstant.h"
 #include "PianoHand.h"
 #include "VirtualTimer.h"
 #include "fastio.h"
-#include "PCA9685.h"
 
 #define X_STEP			2
 #define Y_STEP			3
@@ -54,11 +54,11 @@ void setup()
 	LeftHand->SetActiveAngle(LEFT_RELEASE_ANGLE, LEFT_PRESS_ANGLE);
 	RightHand->SetActiveAngle(RIGHT_RELEASE_ANGLE, RIGHT_PRESS_ANGLE);
 
-	/*PianoSheet.SetTempo(65);
-	PianoSheet.SetSheet(SheetSector, LEFT);
+	//PianoSheet.SetTempo(65);
+	//PianoSheet.SetSheet(SheetSector, LEFT);
 
-	PianoSheet.SetHandToneFa(LeftHand);
-	PianoSheet.SetHandToneSol(RightHand);*/
+	//PianoSheet.SetHandToneFa(LeftHand);
+	//PianoSheet.SetHandToneSol(RightHand);
 
 	VirtualTimer.Init();
 
@@ -67,42 +67,24 @@ void setup()
 	VirtualTimer.Run();
 
 	Home();
-	LaunchFingers();
+	//LaunchFingers();
 }
 
 void loop()
-{
-	
-	//PianoSheet.Execute();
+{	
+	PianoSheet.Execute();
 }
 
-void LaunchFingers()
-{
-	/*RightHand->UpdateHandPlacement(C5);
-	RightHand->PressKey(C5, 1);
-	delay(500);
-	RightHand->Release();
-	delay(200);
-	RightHand->PressKey(D5, 1);
-	delay(500);
-	RightHand->Release();
-	delay(200);
-	RightHand->PressKey(E5, 1);
-	delay(500);
-	RightHand->Release();
-	delay(200);
-	RightHand->PressKey(F5, 1);
-	delay(500);
-	RightHand->Release();
-	delay(200);
-	RightHand->PressKey(G5, 1);
-	delay(500);*/
-}
+//void LaunchFingers()
+//{
+//	RightHand->PressKey(F7, 1);
+//	delay(500);
+//	RightHand->Release();
+//	delay(500);
+//}
 
 void Home()
 {
-	Serial.println("move home");
-
 	LeftHand->UpdateHandPlacement(C8);
 
 	LeftHand->Move(A0);
@@ -113,8 +95,6 @@ void Home()
 	}
 
 	LeftHand->Stop();
-
-	Serial.println("finish move");
 
 	LeftHand->UpdateHandPlacement(A0);
 
