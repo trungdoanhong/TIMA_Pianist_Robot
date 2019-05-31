@@ -33,9 +33,14 @@ void Sheet::SetTempo(int tem)
 void Sheet::SetSheet(String s, uint8_t handID)
 {
 	sheet[handID] = s;
-	convertToNotes(notes[handID], sheet[handID]);
+	convertToNotes(handID, s);
+
 	getNewSection(handID);
+	Serial.println(destinationNoteOrder[handID]);
+
 	getNextNotes(handID);
+	Serial.println(pressNotes[handID][0]);
+	Serial.println(handPlacement[handID]);
 }
 
 void Sheet::Execute()
@@ -69,6 +74,9 @@ void Sheet::Execute()
 	}	
 
 	RUN_EVERY(executeThread, interval);
+
+	Serial.print("P:");
+	Serial.println(getNoteName(hand[RIGHT]->GetCurrentPos()));
 	
 	checkBeatForPress(LEFT);
 	checkBeatForPress(RIGHT);
@@ -76,10 +84,10 @@ void Sheet::Execute()
 
 void Sheet::getNewSection(uint8_t handID)
 {
-	uint8_t value;
+	uint8_t value =  0;
 	currentNoteOrder[handID] = destinationNoteOrder[handID];
 
-	while (1)
+	while (destinationNoteOrder[handID] < notesSize[handID])
 	{
 		destinationNoteOrder[handID]++;		
 
@@ -101,11 +109,15 @@ void Sheet::getNewSection(uint8_t handID)
 }
 
 void Sheet::getNextNotes(uint8_t handID)
-{
+{	
 	if (notes[handID][currentNoteOrder[handID]] >= N1)
 	{
 		noteValue[handID] = notes[handID][currentNoteOrder[handID]];
-		currentNoteOrder[handID]++;
+
+		if (currentNoteOrder[handID] - 1 < notesSize[handID])
+		{
+			currentNoteOrder[handID]++;
+		}
 	}
 	
 	uint8_t highestNote = pressNotes[handID][0];
@@ -115,62 +127,83 @@ void Sheet::getNextNotes(uint8_t handID)
 
 	bool isGoOn = false;
 
-	if (notes[handID][currentNoteOrder[handID]] < notes[handID][currentNoteOrder[handID] + 1])
-		isGoOn = true;
-
-	for (uint16_t i = currentNoteOrder[handID] + 1; i <= destinationNoteOrder[handID]; i++)
+	int16_t handPlaceOrder = currentNoteOrder[handID];
+	while (handPlaceOrder < notesSize[handID])
 	{
-		if (currentNoteOrder[handID] > C8)
+		if (notes[handID][handPlaceOrder] == RE)
 		{
-			continue;
-		}
-
-		noteNumber++;
-
-		if (isGoOn == true)
-		{
-			if (currentNoteOrder[handID] > highestNote)
-			{
-				highestNote = currentNoteOrder[handID];
-			}
-
-			if (currentNoteOrder[handID] < lastNote)
-			{
-				break;
-			}
+			handPlaceOrder += 2;
 		}
 		else
 		{
-			if (currentNoteOrder[handID] < lowestNote)
-			{
-				lowestNote = currentNoteOrder[handID];
-			}
-
-			if (currentNoteOrder[handID] > lastNote)
-			{
-				break;
-			}
+			break;
 		}
 	}
 
-	if (noteNumber > 5)
-		noteNumber = 5;
+	if (notesSize[handID] - handPlaceOrder > 3 )
+	{
+		if (notes[handID][handPlaceOrder] < notes[handID][handPlaceOrder + 2])
+			isGoOn = true;
+
+		for (uint16_t i = handPlaceOrder; i <= notesSize[handID]; i+=2)
+		{
+			if (handPlaceOrder > C8)
+			{
+				continue;
+			}
+
+			noteNumber++;
+
+			if (isGoOn == true)
+			{
+				if (handPlaceOrder > highestNote)
+				{
+					highestNote = handPlaceOrder;
+				}
+
+				if (handPlaceOrder < lastNote)
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (handPlaceOrder < lowestNote)
+				{
+					lowestNote = handPlaceOrder;
+				}
+
+				if (handPlaceOrder > lastNote)
+				{
+					break;
+				}
+			}
+		}
+
+		if (noteNumber > 5)
+			noteNumber = 5;
+	}
 
 	pressNotes[handID][0] = notes[handID][currentNoteOrder[handID]];
 
-	handPlacement[handID] = pressNotes[handID][0] - (5 - noteNumber);
+	Serial.print("po:");
+	Serial.println(handPlaceOrder);
+
+	handPlacement[handID] = notes[handID][handPlaceOrder] - (5 - noteNumber);
+
+	noteValue[handID] = notes[handID][currentNoteOrder[handID] + 1];
 }
 
 // "G4-1 C5 D5 D5-2 E5 E5-8 C5-1 D5 E5 D5-2 G5 G5-9 RE-1 C5-1 D5 E5 D5-2 G5 G5-8 RE-1 G5-1 A5 B5 B5-2 C6 C6-6 D6-2 E6 D6 C6 B5-8 RE-1";
 
 
-void Sheet::convertToNotes(uint8_t * ns, String s)
+void Sheet::convertToNotes(uint8_t handID, String s)
 {
-	uint16_t idOrder = 0;
-	uint16_t spaceOrder1 = 0;
-	uint16_t spaceOrder2 = 1;
+	int idOrder = 0;
+	int spaceOrder1 = 0;
+	int spaceOrder2 = 1;
 	uint16_t noteOrder = 0;
-	uint8_t noteValue = 1;
+	int8_t noteValue = 1;
 
 	while (spaceOrder2 != s.length())
 	{
@@ -181,10 +214,12 @@ void Sheet::convertToNotes(uint8_t * ns, String s)
 
 		String keyS = s.substring(spaceOrder1, spaceOrder2);
 
+		Serial.print(keyS);
+		Serial.print(" ");
+
 		spaceOrder1 = spaceOrder2 + 1;
 
-
-		uint8_t barOrder = keyS.indexOf('-');
+		int8_t barOrder = keyS.indexOf('-');
 
 		if (barOrder < 0)
 		{
@@ -192,17 +227,22 @@ void Sheet::convertToNotes(uint8_t * ns, String s)
 		}
 		else
 		{
-			noteValue = getValueID(keyS.substring(barOrder));
+			noteValue = getValueID(keyS.substring(barOrder + 1));
 		}
 
 		String noteS = keyS.substring(0, barOrder);
-
+		
 		uint8_t noteID = getNoteID(noteS);
 
-		ns[noteOrder] = noteID;
-		noteOrder++;
-		ns[noteOrder] = noteValue;
+		notes[handID][noteOrder] = noteID;
+		++noteOrder;
+		notes[handID][noteOrder] = noteValue;
+		++noteOrder;
 	}
+
+	notesSize[handID] = noteOrder;
+
+	printNotes(handID);
 }
 
 bool Sheet::isNoteSign(char c)
@@ -246,12 +286,44 @@ uint8_t Sheet::getNoteID(String note)
 	if (note == "RE")
 		return RE;
 	else
-		return tone * 7 + order - 5;
+		return tone * 7 + order - 5 + 1;
 }
 
 uint8_t Sheet::getValueID(String value)
 {
 	return value.toInt() + 70;
+}
+
+String Sheet::getNoteName(uint8_t id)
+{
+	uint8_t order;
+	uint8_t tone;
+	String name = "";
+	
+	tone = (id + 4) / 7;
+	order = (id + 4) % 7;
+
+	if (tone == 0)
+		name = "C";
+	if (tone == 1)
+		name = "D";
+	if (tone == 2)
+		name = "E";
+	if (tone == 3)
+		name = "F";
+	if (tone == 4)
+		name = "G";
+	if (tone == 5)
+		name = "A";
+	if (tone == 6)
+		name = "B";
+
+	if (tone == RE)
+		name = "RE";
+	else
+		name += String(order);
+
+	return name;
 }
 
 void Sheet::checkHandPosition(uint8_t handID)
@@ -280,7 +352,7 @@ void Sheet::checkStateForMoveNextPosition(uint8_t handID)
 {
 	if (isJustRelease[handID] == true)
 	{
-		currentNoteOrder[handID]++;
+		currentNoteOrder[handID]+=2;
 
 		if (currentNoteOrder[handID] > destinationNoteOrder[handID])
 		{
@@ -299,12 +371,26 @@ void Sheet::checkBeatForPress(uint8_t handID)
 
 	if (!hand[handID]->IsMoving() && hand[handID]->SkipBeat <= 0)
 	{
-		hand[handID]->PressKeys(pressNotes[handID], noteValue[handID]);
+		Serial.print("k:");
+		Serial.println(pressNotes[handID][0]);
+		hand[handID]->PressKeys(pressNotes[handID], noteValue[handID] - 70);
+		hand[handID]->PressTime = interval * hand[handID]->SkipBeat - UP_FINGER_TIME;
 		releaseThread[handID].Counter = millis();
 	}
 }
 
-uint16_t Sheet::log2(uint16_t n)
+void Sheet::printNotes(uint8_t handID)
+{
+	for (uint16_t i = 0; i < notesSize[handID]; i++)
+	{
+		Serial.print(notes[handID][i]);
+		Serial.print("-");
+		Serial.print(notes[handID][++i]);
+		Serial.print(" ");
+	}
+}
+
+int16_t Sheet::log2(int16_t n)
 {
 	int i = 0;
 	int r = 1;

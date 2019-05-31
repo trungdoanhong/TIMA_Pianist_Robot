@@ -9,11 +9,12 @@ PianoHand::PianoHand()
 	Wire.begin();                
 	Wire.setClock(400000);      
 
-	PWMMaker = PCA9685_ServoEvaluator(102, 310, 505);
+	PWMMaker = new PCA9685_ServoEvaluator(102, 310, 505);
+	ServoManager = new PCA9685();
 
-	ServoManager.resetDevices();        // Software resets all PCA9685 devices on Wire line
-	ServoManager.init(B000000);         // Address pins A5-A0 set to B000000
-	ServoManager.setPWMFrequency(50);   // Set frequency to 50Hz	
+	//ServoManager.resetDevices();        // Software resets all PCA9685 devices on Wire line
+	ServoManager->init(B000000);         // Address pins A5-A0 set to B000000
+	ServoManager->setPWMFrequency(50);   // Set frequency to 50Hz
 }
 
 void PianoHand::Init(uint8_t* pins, uint8_t f1, uint8_t f2, uint8_t f3, uint8_t f4, uint8_t f5)
@@ -46,7 +47,7 @@ void PianoHand::SetStepperMotor(uint8_t step, uint8_t dir, uint8_t en, uint8_t e
 void PianoHand::SetActiveAngle(int release, int press)
 {
 	releaseAngle = release;
-	pressAngle = pressAngle;
+	pressAngle = press;
 }
 
 int * PianoHand::GetFingerState()
@@ -78,15 +79,13 @@ void PianoHand::PressKeys(uint8_t * keys, uint8_t value)
 		return;
 	}
 
-	//Serial.println(fingers[0]);
-
 	for (uint8_t index = 0; index < 1; index++)
 	{
 		for (uint8_t i = 0; i < 5; i++)
 		{
 			if (fingers[i] == keys[index])
 			{
-				ServoManager.setChannelPWM(i, PWMMaker.pwmForAngle(pressAngle));
+				ServoManager->setChannelPWM(fingerPins[i], PWMMaker->pwmForAngle(pressAngle));
 				SkipBeat = value;
 
 				fingerState = PRESSING;
@@ -97,9 +96,24 @@ void PianoHand::PressKeys(uint8_t * keys, uint8_t value)
 
 void PianoHand::Release()
 {
+	/*while (1)
+	{
+		for (uint8_t i = 0; i < 5; i++)
+		{
+			ServoManager.setChannelPWM(i, PWMMaker.pwmForAngle(30));
+		}
+		delay(1000);
+
+		for (uint8_t i = 0; i < 5; i++)
+		{
+			ServoManager.setChannelPWM(i, PWMMaker.pwmForAngle(-50));
+		}
+		delay(1000);
+	}*/
+
 	for (uint8_t i = 0; i < 5; i++)
 	{
-		ServoManager.setChannelPWM(i, PWMMaker.pwmForAngle(releaseAngle));		
+		ServoManager->setChannelPWM(fingerPins[i], PWMMaker->pwmForAngle(releaseAngle));
 	}
 
 	fingerState = UPPING;
@@ -129,7 +143,7 @@ void PianoHand::Stop()
 
 void PianoHand::UpdateHandPlacement(uint8_t note)
 {
-	float posMM = note * WIDTH_OF_KEY + PLACEMENT_OFFSET;
+	float posMM = note * WIDTH_OF_KEY - PLACEMENT_OFFSET;
 
 	long posSteps = posMM * STEPS_PER_MM;
 
@@ -155,7 +169,7 @@ void PianoHand::setDirection(int8_t dir)
 
 void PianoHand::updateFingerPosition()
 {
-	int fingerID = (CurrentStep / STEPS_PER_MM) / WIDTH_OF_KEY;
+	int fingerID = round((CurrentStep / STEPS_PER_MM) / WIDTH_OF_KEY);
 
 	int jumpNotes = fingerID - fingers[0];
 
@@ -187,4 +201,22 @@ bool PianoHand::IsPressing()
 		return true;
 
 	return false;
+}
+
+void PianoHand::TestServo()
+{
+	while (1)
+	{
+		for (uint8_t i = 0; i < 5; i++)
+		{
+			ServoManager->setChannelPWM(fingerPins[i], PWMMaker->pwmForAngle(pressAngle));
+		}
+		delay(1000);
+
+		for (uint8_t i = 0; i < 5; i++)
+		{
+			ServoManager->setChannelPWM(fingerPins[i], PWMMaker->pwmForAngle(releaseAngle));
+		}
+		delay(1000);
+	}
 }

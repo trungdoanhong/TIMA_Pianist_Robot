@@ -42,6 +42,8 @@ public:
 	bool IsMoving();
 	bool IsPressing();
 
+	void TestServo();
+
 	long CurrentStep = 0;
 	long DesiredStep = 0;
 	int8_t DirectionValue = 1;
@@ -73,8 +75,8 @@ private:
 
 	uint8_t fingerState;
 
-	PCA9685_ServoEvaluator PWMMaker;
-	PCA9685 ServoManager;
+	PCA9685_ServoEvaluator* PWMMaker;
+	PCA9685* ServoManager;
 
 	float keyWidth = 23.5f;
 };

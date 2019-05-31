@@ -9,66 +9,66 @@
 	#include "WProgram.h"
 #endif
 
-#define A0		0
-#define B0		1
+#define A0		1
+#define B0		2
 
-#define C1		2
-#define D1		3
-#define E1		4
-#define F1		5
-#define G1		6
-#define A1		7
-#define B1		8
+#define C1		3
+#define D1		4
+#define E1		5
+#define F1		6
+#define G1		7
+#define A1		8
+#define B1		9
 
-#define C2		9
-#define D2		10
-#define E2		11
-#define F2		12
-#define G2		13
-#define A2		14
-#define B2		15
+#define C2		10
+#define D2		11
+#define E2		12
+#define F2		13
+#define G2		14
+#define A2		15
+#define B2		16
 
-#define C3		16
-#define D3		17
-#define E3		18
-#define F3		19
-#define G3		20
-#define A3		21
-#define B3		22
+#define C3		17
+#define D3		18
+#define E3		19
+#define F3		20
+#define G3		21
+#define A3		22
+#define B3		23
 
-#define C4		23
-#define D4		24
-#define E4		25
-#define F4		26
-#define G4		27
-#define A4		28
-#define B4		29
+#define C4		24
+#define D4		25
+#define E4		26
+#define F4		27
+#define G4		28
+#define A4		29
+#define B4		30
 
-#define C5		30
-#define D5		31
-#define E5		32
-#define F5		33
-#define G5		34
-#define A5		35
-#define B5		36
+#define C5		31
+#define D5		32
+#define E5		33
+#define F5		34
+#define G5		35
+#define A5		36
+#define B5		37
 
-#define C6		37
-#define D6		38
-#define E6		39
-#define F6		40
-#define G6		41
-#define A6		42
-#define B6		43
+#define C6		38
+#define D6		39
+#define E6		40
+#define F6		41
+#define G6		42
+#define A6		43
+#define B6		44
 
-#define C7		44
-#define D7		45
-#define E7		46
-#define F7		47
-#define G7		48
-#define A7		49
-#define B7		50
+#define C7		45
+#define D7		46
+#define E7		47
+#define F7		48
+#define G7		49
+#define A7		50
+#define B7		51
 
-#define C8		51
+#define C8		52
 
 #define RE		60
 

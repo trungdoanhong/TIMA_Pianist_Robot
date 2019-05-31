@@ -40,9 +40,10 @@ private:
 	bool isJustRelease[2] = { false, false };
 	bool isHandInPosition = true;
 
-	uint8_t currentNoteOrder[2] = { 0, 0 };
-	uint8_t destinationNoteOrder[2] = { 0, 0 };
+	int16_t currentNoteOrder[2] = { 0, 0 };
+	int16_t destinationNoteOrder[2] = { 0, 0 };
 	String sheet[2];
+	uint16_t notesSize[2];
 	uint8_t notes[2][100];
 	uint16_t interval = 500;
 	int tempo = 120;
@@ -52,19 +53,20 @@ private:
 
 	void getNewSection(uint8_t handID);
 	void getNextNotes(uint8_t handID);
-	void convertToNotes(uint8_t* ns, String s);
+	void convertToNotes(uint8_t handID, String s);
 	bool isNoteSign(char c);
 	bool isNumber(char c);
 	uint8_t getNoteID(String note);
 	uint8_t getValueID(String value);
+	String getNoteName(uint8_t id);
 
 	void checkHandPosition(uint8_t handID);
 	void checkTimeForReleaseFinger(uint8_t handID);
 	void checkStateForMoveNextPosition(uint8_t handID);
 	void checkBeatForPress(uint8_t handID);
 
-	uint16_t log2(uint16_t n);
+	void printNotes(uint8_t handID);
+	int16_t log2(int16_t n);
 };
 
 #endif
-
